@@ -1,1 +1,613 @@
-{"schemaVersion":1,"owner":{"name":"Parth Shrestha","headline":"Software developer","bio":"Building thoughtful digital experiences. Exploring ideas through code, photography, and machines."},"projects":[{"id":"luthier","slug":"the-luthiers-library","title":"The Luthier’s Library","summary":"Modernizing an instrument archive.","stack":["React","FastAPI","AWS"],"image":{"src":"/assets/projects/violin.webp","alt":"Illustrative cover art: a violin on a luthier’s workbench"},"caseStudy":{"problem":"A curated catalogue for instruments, makers, and their stories.","role":"Project details are being prepared.","approach":"Bringing an instrument archive into a thoughtful digital experience.","architecture":"Draft stack: React, FastAPI, and AWS. Implementation notes and screenshots will be added as the case study develops."},"links":{}},{"id":"pipeline","slug":"open-data-pipeline","title":"Open Data Pipeline","summary":"From raw public data to meaningful insights.","stack":["Python","Data harmonization"],"caseStudy":{"problem":"Connecting public data.","role":"Project details are being prepared.","approach":"Exploring a pipeline for cleaning, transforming, and connecting public datasets.","architecture":"Draft technical direction: Python and data harmonization. Source details and implementation notes will be added here."},"links":{}},{"id":"300zx","slug":"300zx-project","title":"300ZX Project","summary":"A 1991 Nissan 300ZX. A never-ending learning experience.","stack":["Machines","Personal project"],"image":{"src":"/assets/projects/300zx.webp","alt":"Illustrative cover art: burgundy Nissan 300ZX in a garage"},"caseStudy":{"problem":"A timeless machine, and a reason to keep learning.","role":"Personal project.","approach":"Build notes and photographs will be collected here."},"links":{}}],"interests":[{"id":"photography","title":"Photography","description":"Moments, perspectives, places. A gallery is taking shape."},{"id":"machines","title":"Machines & curiosity","description":"The 300ZX project: learning through a different medium.","image":{"src":"/assets/projects/300zx.webp","alt":"Illustrative cover art of a burgundy Nissan 300ZX"}}],"contact":{}}
+{
+  "schemaVersion": 1,
+  "owner": {
+    "name": "Parth Shrestha",
+    "headline": "Full-stack software engineer",
+    "bio": "Full-stack software engineer and a Computer Science graduate of the University of Colorado Boulder, with a minor in Business. I build responsive React front ends and FastAPI services on AWS — most recently The Luthier’s Library, an archival platform for more than 1,200 antique instruments. Before that I trained CoreML models for diagnostic ultrasound, and spent two years teaching data structures, algorithms and systems to students at CU. Outside the editor: photography, and a 1991 Nissan 300ZX that keeps teaching me things."
+  },
+  "projects": [
+    {
+      "id": "luthier",
+      "slug": "the-luthiers-library",
+      "title": "The Luthier’s Library",
+      "summary": "An archival platform for more than 1,200 antique instruments.",
+      "stack": [
+        "React",
+        "Vite",
+        "Tailwind CSS",
+        "FastAPI",
+        "SQLAlchemy",
+        "MySQL",
+        "Amazon Cognito",
+        "Amazon S3",
+        "Stripe"
+      ],
+      "image": {
+        "src": "/assets/projects/luthiers-library-logo.webp",
+        "alt": "The Luthier’s Library logo: a violin, half photograph and half technical line drawing",
+        "fit": "contain"
+      },
+      "caseStudy": {
+        "problem": "A catalogue of more than 1,200 antique instruments, their makers and their stories — held in a platform that a non-technical organization could not comfortably maintain.",
+        "role": "Software Engineer (Full-Stack), May 2025 – present. Primary technical point of contact for clients on a two-engineer team.",
+        "approach": "Modernized the platform with responsive front-end pages in React and Tailwind CSS, built so a non-technical organization can operate it. Conducted cross-browser and responsive manual testing of key UI/UX pages, so new features render correctly for everyone before deployment.",
+        "architecture": "The web client is React with Vite and Tailwind CSS, carrying instrument and maker search, galleries and measurements, and the contributor and admin tools — visitors, members, contributors and admins all arrive through it. Authentication is Amazon Cognito: the client signs up and signs in there and receives tokens, then calls the FastAPI REST API over HTTPS with a JWT. The API pulls Cognito's signing keys so it can validate those tokens itself, and enforces access control per role. Behind the API, MySQL holds instruments, makers and members through SQLAlchemy, and Amazon S3 holds the media — instrument images, maker photos and arch PDFs. Stripe covers checkout, subscriptions and billing webhooks. The API also generates PDF exports: printable instrument reference sheets. The diagram is drawn from the application code, so it describes the logical application rather than the deployment."
+      },
+      "diagram": {
+        "src": "/assets/diagrams/luthiers-library-architecture.webp",
+        "alt": "Logical application architecture for The Luthier's Library. A React, Vite and Tailwind CSS web client used by visitors, members, contributors and admins authenticates against Amazon Cognito, then calls a FastAPI REST API over HTTPS with a JWT; the API fetches Cognito's signing keys to validate tokens and apply access control. The API reads and writes MySQL through SQLAlchemy for instruments, makers and members, exchanges media with Amazon S3 holding instrument images, maker photos and arch PDFs, sends billing and webhooks to Stripe, and generates PDF exports of instrument reference sheets.",
+        "caption": "The client authenticates against Cognito, then calls the FastAPI REST API with a JWT the API validates using Cognito's signing keys. Drawn from application code; deployment hosting is not shown."
+      },
+      "links": {
+        "demo": "https://luthierslibrary.click/"
+      }
+    },
+    {
+      "id": "lenshive",
+      "slug": "lenshive",
+      "title": "LensHive",
+      "summary": "A two-sided marketplace connecting clients with photographers by photo spot.",
+      "stack": [
+        "React",
+        "Vite",
+        "FastAPI",
+        "Amazon EC2",
+        "Amazon RDS",
+        "Amazon S3",
+        "AWS Cognito",
+        "Stripe",
+        "Google Maps Platform"
+      ],
+      "caseStudy": {
+        "problem": "Booking a photographer usually starts with a name. It more often starts with a place — a specific spot someone wants photographed.",
+        "role": "Full-Stack Software Engineer, March – April 2025.",
+        "approach": "Designed the core discovery experience: search by photo spot on an interactive Google Maps view that pins photographers’ portfolio photos to their locations. Shipped end-to-end photographer onboarding — profile and portfolio management, service packages, and a quote-to-inquiry flow.",
+        "architecture": "Everything runs on one EC2 instance: Nginx serves the React and Vite front end and proxies /api to the FastAPI backend behind it. FastAPI talks SQL to Amazon RDS for MySQL, which holds users, profiles, photo spots, bookings and albums. Amazon Cognito handles sign-in and issues tokens to the browser, and FastAPI validates those JWTs and performs account administration against Cognito — that is where the client, photographer and admin split is enforced. Media is split by who is allowed to see it: public images such as portfolios and avatars are delivered through Amazon CloudFront, which reaches S3 by origin access over public prefixes, while private client albums never touch the CDN — the browser uploads and downloads those straight from S3 with presigned PUT and GET URLs, so access is time-limited instead of public. FastAPI does the photo processing and storage behind both paths. Outside AWS, the Google Maps Platform supplies maps, places and geocoding for the photo-spot search, Stripe covers checkout, subscriptions and Connect over its API and webhooks, and GitHub Actions deploys to the instance over SSH.",
+        "outcome": "Feature delivery was accelerated using Claude Code."
+      },
+      "diagram": {
+        "src": "/assets/diagrams/lenshive-architecture.webp",
+        "alt": "System architecture diagram for LensHive. Users, photographers and admins reach the LensHive web app, which signs in against Amazon Cognito and sends HTTPS to Nginx on an Amazon EC2 instance. Nginx serves the React and Vite front end and proxies /api to FastAPI, which validates JWTs with Cognito, queries Amazon RDS for MySQL over SQL, and handles photo processing and storage in Amazon S3. Public images are served through Amazon CloudFront with origin access to S3, while private albums use presigned PUT and GET URLs direct to S3. External services are the Google Maps Platform for places and geocoding, Stripe for checkout, subscriptions and Connect, and GitHub Actions deploying over SSH.",
+        "caption": "Nginx on EC2 serves the front end and proxies /api to FastAPI. Public media goes out through CloudFront; private albums use time-limited presigned S3 URLs."
+      },
+      "links": {
+        "demo": "https://lenshive.net/"
+      },
+      "image": {
+        "src": "/assets/projects/lenshive-logo.webp",
+        "alt": "LensHive logo: a bee over a honeycomb, in amber",
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "shrestha-media",
+      "slug": "shrestha-media",
+      "title": "Shrestha Media",
+      "summary": "A photography studio site with expiring S3 album delivery and a booking flow.",
+      "stack": [
+        "React",
+        "FastAPI",
+        "Nginx",
+        "Amazon EC2",
+        "Amazon RDS",
+        "Amazon Cognito",
+        "Amazon S3"
+      ],
+      "image": {
+        "src": "/assets/projects/shrestha-media-logo.webp",
+        "alt": "Shrestha Media logo: a camera body lettered SM with an amber play triangle",
+        "fit": "contain"
+      },
+      "caseStudy": {
+        "problem": "A photography studio has to show its work the way clients actually shop for it — by the kind of session they are booking — and turn a visit into an inquiry, without handing the entire delivered catalogue to anyone who finds a URL.",
+        "role": "Designer and developer. Shrestha Media is my own studio, established 2021, working out of Atlanta, Georgia.",
+        "approach": "Built as a single-page React application organised around session types — senior portraits, family, concerts, engagements, proposals. The landing gallery is interactive: side photographs rotate on click and open on double-click. An Instagram feed keeps recent work on the page without manual updates, and a booking flow turns a visit into a session inquiry.",
+        "architecture": "The whole thing runs in AWS. A single EC2 instance hosts Nginx in front of a FastAPI application — Nginx serves the built React front end and reverse-proxies the API behind it — with FastAPI reading and writing Amazon RDS and emitting logs and metrics to Amazon CloudWatch. Authentication is Amazon Cognito, reached from both sides: the browser authenticates against Cognito directly, and FastAPI verifies the resulting tokens on protected requests. Album media lives in Amazon S3, written by the API and then fetched by the browser straight from S3 through presigned, time-limited URLs, so a gallery link expires on its own instead of exposing the catalogue; images are stored per album with pre-generated 1600px derivatives. FastAPI also owns the outside integrations the studio runs on — Google Calendar for scheduling, Gmail for session correspondence, Instagram for the recent-work feed and OpenStreetMap for session locations. In the browser, Google Tag Manager with Google Ads conversion and call tracking measures which bookings actually originate from the site.",
+        "outcome": "Live at shresthamedia.co, where the studio reports more than 240 sessions delivered, a five-star average review and a 48-hour reply time."
+      },
+      "diagram": {
+        "src": "/assets/diagrams/shrestha-media-architecture.webp",
+        "alt": "Architecture diagram for Shrestha Media. Users reach an Nginx reverse proxy and a FastAPI service running on Amazon EC2 inside the AWS Cloud. FastAPI connects to Amazon Cognito, Amazon RDS, Amazon S3 and Amazon CloudWatch; users also reach Cognito and S3 directly. FastAPI calls out to Google Calendar, Instagram, Gmail and OpenStreetMap.",
+        "caption": "Users hit Nginx on EC2, which fronts FastAPI. The browser talks to Cognito and S3 directly; everything else goes through the API."
+      },
+      "links": {
+        "demo": "https://shresthamedia.co/"
+      }
+    },
+    {
+      "id": "naya-driver",
+      "slug": "naya-driver",
+      "title": "Naya Driver",
+      "summary": "Serverless SMS feedback collection behind a real-time ratings dashboard.",
+      "stack": [
+        "Python",
+        "FastAPI",
+        "AWS Lambda",
+        "Twilio",
+        "MongoDB Atlas"
+      ],
+      "caseStudy": {
+        "problem": "Collecting driver feedback over SMS and turning it into ratings someone can read at a glance.",
+        "role": "Full-Stack Software Engineer, March – April 2025.",
+        "approach": "Engineered a microservice architecture using Python FastAPI on AWS Lambda, with API Gateway for HTTP routing and the Twilio API for SMS-based feedback ingestion into MongoDB Atlas.",
+        "architecture": "A static front end deployed from S3 buckets visualizes real-time ratings with dynamic gauge animations in HTML, CSS and JavaScript. Stateless Lambda functions manage the data flow, leveraging serverless scalability and minimal operational overhead."
+      },
+      "links": {}
+    },
+    {
+      "id": "store-inventory",
+      "slug": "store-inventory-management",
+      "title": "Store Inventory Management",
+      "summary": "A back-end simulation of daily store operations, transactions and inventory.",
+      "stack": [
+        "Java",
+        "Object-oriented design",
+        "Observer pattern"
+      ],
+      "caseStudy": {
+        "problem": "Modelling a store’s daily activity — transactions, inventory adjustments, payroll and budget — closely enough to reason about it.",
+        "role": "Back-End Java Developer, PGA Tour Superstore, March – May 2023.",
+        "approach": "Developed simulations of daily store activities, such as transactions and inventory adjustments, using object-oriented programming in Java. Adopted the Observer pattern to manage payroll and budget tracking functionality.",
+        "outcome": "Instituted bi-weekly sprints for consistent feature releases and testing, producing predictable and steady development progress."
+      },
+      "links": {}
+    },
+    {
+      "id": "robo-shopper",
+      "slug": "robo-shopper",
+      "title": "Robo Shopper",
+      "summary": "Path planning for a robot retrieving groceries in a simulated store.",
+      "stack": [
+        "Python",
+        "Webots",
+        "LiDAR",
+        "OpenCV",
+        "A* search"
+      ],
+      "caseStudy": {
+        "problem": "A robot sent to fetch groceries in a simulated store has to build its own map of the place and find its way to what it was sent for.",
+        "role": "Robot Path Planning Software Developer, March – April 2022.",
+        "approach": "Developed an algorithm in Python enabling a robot to navigate and retrieve groceries within a simulated Webots environment.",
+        "architecture": "LiDAR and OpenCV let the robot construct a dynamic map of the simulated grocery store. The A* algorithm identifies and traverses the shortest path between its starting position and its destination."
+      },
+      "links": {}
+    }
+  ],
+  "experience": [
+    {
+      "id": "luthier-role",
+      "role": "Software Engineer (Full-Stack)",
+      "organization": "The Luthier’s Library",
+      "location": "Portland, Oregon",
+      "period": "May 2025 — Present",
+      "highlights": [
+        "Modernized a musical instrument archival platform with responsive React and Tailwind CSS front-end pages, built for a non-technical organization.",
+        "Designed and implemented RESTful APIs with FastAPI to serve dynamic content for over 1,200 valuable antique instruments.",
+        "Led development on a two-engineer team, serving as the primary technical point of contact for clients.",
+        "Integrated AWS services — Cognito for authentication, Aurora RDS for data, EC2 for hosting — to ensure scalability, availability and cost efficiency.",
+        "Conducted cross-browser and responsive manual testing of key UI/UX pages before deployment to EC2."
+      ]
+    },
+    {
+      "id": "nyagi",
+      "role": "Software Engineer (ML), Internship",
+      "organization": "Nyagi Project — Computer Assisted Diagnostic Ultrasound",
+      "location": "Boulder, Colorado",
+      "period": "September 2022 — May 2023",
+      "highlights": [
+        "Developed a machine learning model in CoreML for segmenting ultrasound imagery.",
+        "Trained deep learning models using Keras, applying supervised machine learning techniques frame by frame.",
+        "Optimized iOS app responsiveness by 45% through efficient thread utilization.",
+        "Designed and executed test cases to validate CoreML segmentation output against clinician-labeled ground truth, documenting edge cases where the model under-performed."
+      ]
+    },
+    {
+      "id": "student-success",
+      "role": "Software Engineering Consultant",
+      "organization": "Student Success Center",
+      "location": "Boulder, Colorado",
+      "period": "September 2021 — May 2023",
+      "highlights": [
+        "Trained 20–30 learners daily across varying technical skill levels, translating complex computer science concepts — data structures, algorithms, systems — for audiences ranging from beginners to advanced.",
+        "Diagnosed and addressed individual learning challenges by crafting unique approaches to improving comprehension and performance.",
+        "Leveraged a consultative approach to clarify complex computer science principles, ensuring efficient and practical solutions for the challenge at hand.",
+        "Adapted on the spot to diverse programming languages — C++, Python and Java — demonstrating quick problem assessment and effective solution delivery."
+      ]
+    },
+    {
+      "id": "course-assistant",
+      "role": "Course Assistant",
+      "organization": "University of Colorado Boulder, Computer Science Department",
+      "location": "Boulder, Colorado",
+      "period": "September 2021 — May 2023",
+      "highlights": [
+        "Clarified intricate topics such as binary arithmetic, dynamic memory allocation and performance optimization.",
+        "Designed and led weekly workshop-style recitations for roughly 20–30 students, achieving an 80% increase in concept retention.",
+        "Fostered an inclusive learning environment by coordinating with faculty and teaching assistants to introduce efficient code review practices and systematic debugging techniques, mimicking industry DevOps workflows."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "cu-boulder",
+      "school": "University of Colorado Boulder",
+      "credential": "B.S. Computer Science, Minor in Business",
+      "location": "Boulder, Colorado",
+      "details": [
+        "GPA 3.5",
+        "Dean’s List, 2020–2022",
+        "GoldShirt Scholar",
+        "Ball BIPOC Mentee"
+      ]
+    }
+  ],
+  "certifications": [
+    "Claude 101",
+    "AI Fluency",
+    "Agentic AI Mastery (in progress)"
+  ],
+  "skills": [
+    {
+      "level": "Proficient",
+      "items": [
+        "Java",
+        "Python",
+        "JavaScript",
+        "React.js",
+        "Node.js",
+        "HTML",
+        "CSS",
+        "Bootstrap",
+        "MySQL",
+        "REST APIs",
+        "Git",
+        "Claude Code"
+      ]
+    },
+    {
+      "level": "Intermediate",
+      "items": [
+        "C++",
+        "C#",
+        "Docker",
+        "OpenCV",
+        "CoreML",
+        "Figma",
+        "RDBMS",
+        "Agile",
+        "Claude Skills",
+        "Agent AI"
+      ]
+    },
+    {
+      "level": "Beginner",
+      "items": [
+        "MATLAB",
+        "Hibernate",
+        "Swift",
+        "Spring Boot",
+        "Spring Security"
+      ]
+    }
+  ],
+  "interests": [
+    {
+      "id": "photography",
+      "slug": "shrestha-media",
+      "kicker": "Behind the lens",
+      "title": "Photography",
+      "description": "Moments, perspectives, places. Shooting senior portraits, families and live shows through Shrestha Media, the studio I run and built the site for.",
+      "reel": [
+        {
+          "src": "/assets/reel/capitol.mp4",
+          "poster": "/assets/reel/capitol-poster.webp",
+          "alt": "Panning down through the Colorado State Capitol rotunda to a portrait subject waiting on the marble stairs."
+        },
+        {
+          "src": "/assets/reel/grad-flatirons.mp4",
+          "poster": "/assets/reel/grad-flatirons-poster.webp",
+          "alt": "Camera-back view of a graduation portrait framed against the Flatirons."
+        },
+        {
+          "src": "/assets/reel/tassel.mp4",
+          "poster": "/assets/reel/tassel-poster.webp",
+          "alt": "Photographing a graduate turning her tassel in an open field below the foothills."
+        },
+        {
+          "src": "/assets/reel/folsom.mp4",
+          "poster": "/assets/reel/folsom-poster.webp",
+          "alt": "Setting up a graduation portrait in the Folsom Field stands under a storm sky."
+        },
+        {
+          "src": "/assets/reel/field-bts.mp4",
+          "poster": "/assets/reel/field-bts-poster.webp",
+          "alt": "Shooting a couple walking through a golden field below the foothills.",
+          "wide": true
+        },
+        {
+          "src": "/assets/reel/gown-field.mp4",
+          "poster": "/assets/reel/gown-field-poster.webp",
+          "alt": "A graduate in cap and gown against fast-moving clouds over the Flatirons."
+        },
+        {
+          "src": "/assets/reel/celebration.mp4",
+          "poster": "/assets/reel/celebration-poster.webp",
+          "alt": "Covering a family celebration, camera up in the middle of the dancing."
+        }
+      ],
+      "story": {
+        "kicker": "Shrestha Media",
+        "headline": "It started with a friend’s Tinder profile.",
+        "lede": "I bought a camera in college because I liked being outside with it. Clients were not the plan. The first one was a friend who wanted better photos for a dating app — and the referrals, the studio and the software I built to run it all came out of saying yes before I knew what I was doing.",
+        "cover": {
+          "src": "/assets/studio/camera-back.webp",
+          "thumb": "/assets/studio/camera-back-sm.webp",
+          "alt": "A graduate in a white dress holding her diploma in an open field below the Flatirons, framed past the edge of the camera."
+        },
+        "specs": [
+          {
+            "label": "Studio",
+            "value": "Shrestha Media"
+          },
+          {
+            "label": "Established",
+            "value": "2021 · Atlanta, Georgia"
+          },
+          {
+            "label": "Sessions delivered",
+            "value": "240+"
+          },
+          {
+            "label": "Average review",
+            "value": "5 stars"
+          },
+          {
+            "label": "Reply time",
+            "value": "48 hours"
+          },
+          {
+            "label": "First client",
+            "value": "A friend’s dating profile"
+          }
+        ],
+        "links": [
+          {
+            "label": "shresthamedia.co ↗",
+            "href": "https://shresthamedia.co/"
+          },
+          {
+            "label": "The technical case study",
+            "href": "/projects/shrestha-media"
+          }
+        ],
+        "chapters": [
+          {
+            "id": "hobby",
+            "title": "A camera, and nowhere in particular to be",
+            "body": [
+              "In college the camera came with me into the snow and out into the wilderness, and that was the entire point of it. No clients, no packages, no second shooter. I shot because the light was doing something and I wanted to keep it.",
+              "I was not a photographer. I was a Computer Science student who owned a nice camera and kept finding reasons to carry it."
+            ],
+            "image": {
+              "src": "/assets/studio/field-shoot.webp",
+              "thumb": "/assets/studio/field-shoot-sm.webp",
+              "alt": "Crouched in waist-high golden grass with a long telephoto lens, shooting down a hillside."
+            }
+          },
+          {
+            "id": "justin",
+            "title": "Justin needed photos for Tinder",
+            "body": [
+              "My friend Justin asked if he could borrow the nice camera — or really, the person attached to it — for photos for his dating profile. One afternoon. No money, no contract, no sense at all that it was the start of something.",
+              "That is the whole origin story. Somebody needed a photo and I was the one who owned the camera."
+            ]
+          },
+          {
+            "id": "food",
+            "title": "Paid in food, mostly",
+            "body": [
+              "Word moved the way it does in college. Friends of friends started asking. For a long stretch the going rate was dinner — somebody would buy me food and I would spend the afternoon shooting and the night editing.",
+              "Fake it till you make it is accurate, but it undersells the part where you have to actually make it. I said yes to sessions I had never done before and then went and learned what I had just promised. Every one of them taught me something I could not have read."
+            ]
+          },
+          {
+            "id": "referrals",
+            "title": "Then strangers started asking",
+            "body": [
+              "The shift was quiet. People I had never met began reaching out, and when I asked how they found me the answer was always somebody I had shot for. Referrals are the only marketing that has ever worked for me, and they are honest feedback in a way nothing else is — nobody passes your name along to a friend out of politeness.",
+              "Senior portraits, families, engagements, proposals, concerts, whole events where I was the one person responsible for how the night gets remembered. Somewhere in there I stopped calling it a hobby."
+            ],
+            "image": {
+              "src": "/assets/studio/celebration.webp",
+              "thumb": "/assets/studio/celebration-sm.webp",
+              "alt": "Guests in saris and formalwear mid-dance at a family celebration, shot from the middle of the room."
+            }
+          },
+          {
+            "id": "studio",
+            "title": "Building the studio I was already running",
+            "body": [
+              "By then the work was real and the operation around it was not. Albums went out as links that lived forever. Inquiries arrived as DMs. I had no idea which sessions came from the internet and which came from someone’s cousin.",
+              "So I built shresthamedia.co the way I would build anything at work. A React front end and a FastAPI service sitting behind Nginx on one EC2 instance, Amazon RDS underneath, Cognito for sign-in, CloudWatch so I can actually see what broke. The site itself is organised around the thing clients shop for — the session type. Portraits, senior portraits, family, engagement, proposal, concerts.",
+              "The piece that changed my week is delivery. Album media lives in Amazon S3, and the browser pulls it straight from S3 through presigned, time-limited URLs rather than public objects, so a gallery link expires on its own instead of quietly handing over the whole catalogue to anyone who ever had it. Each album is stored with pre-generated 1600px derivatives, so a client opening twenty photos on their phone is never waiting on a resize. Clients sign in through Cognito for their own gallery instead of digging through a text thread for a link.",
+              "The integrations are what actually gave me my week back. Sessions land in Google Calendar, correspondence goes out through Gmail, an Instagram feed keeps recent work on the page without me touching it, and OpenStreetMap handles session locations. The booking flow asks what kind of session it is, so my first reply is an answer instead of a questionnaire. And in the browser, Google Tag Manager with Ads conversion and call tracking finally tells me which bookings actually started on the site — which is also how I know how much of this is still word of mouth."
+            ],
+            "diagram": {
+              "src": "/assets/diagrams/shrestha-media-architecture.webp",
+              "alt": "Architecture diagram for Shrestha Media. Users reach an Nginx reverse proxy and a FastAPI service running on Amazon EC2 inside the AWS Cloud. FastAPI connects to Amazon Cognito, Amazon RDS, Amazon S3 and Amazon CloudWatch; users also reach Cognito and S3 directly. FastAPI calls out to Google Calendar, Instagram, Gmail and OpenStreetMap.",
+              "caption": "Users hit Nginx on EC2, which fronts FastAPI. The browser talks to Cognito and S3 directly; everything else goes through the API."
+            },
+            "image": {
+              "src": "/assets/studio/capitol.webp",
+              "thumb": "/assets/studio/capitol-sm.webp",
+              "alt": "A subject standing alone on the marble staircase of the Colorado State Capitol, under the gilded rotunda."
+            }
+          },
+          {
+            "id": "lenshive",
+            "title": "Next: giving the workflow away",
+            "body": [
+              "Every photographer I know is running some version of the mess I used to run. Delivery held together with shared drives, bookings buried in a message folder, no real idea where the work is coming from. I have a workflow now. It is not clever — it is just built.",
+              "LensHive is where that goes next. A two-sided marketplace that starts from the place instead of the name: search a photo spot on a map and find the people who shoot there, with the operational half built in — photographer onboarding, portfolio and package management, quotes, payments. React and FastAPI, Cognito handling the split between client, photographer and admin, Stripe underneath, portfolio media on S3.",
+              "It is still in progress, and that is as much as I am saying about it for now."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "machines",
+      "slug": "300zx",
+      "title": "Machines & curiosity",
+      "description": "The 300ZX project: a 1991 Nissan bought in California, torn down to its bare bay for a turbo swap, and a never-ending learning experience in a different medium.",
+      "image": {
+        "src": "/assets/projects/300zx.webp",
+        "alt": "Illustrative cover art of a burgundy Nissan 300ZX"
+      },
+      "gallery": [
+        {
+          "src": "/assets/garage/300zx-dusk-front.webp",
+          "thumb": "/assets/garage/300zx-dusk-front-sm.webp",
+          "alt": "The white 300ZX at dusk on a back road below the Flatirons, headlights on."
+        },
+        {
+          "src": "/assets/garage/300zx-bay-stripped.webp",
+          "thumb": "/assets/garage/300zx-bay-stripped-sm.webp",
+          "alt": "The engine bay stripped down to bare metal and wiring, the harness laid out across the car with every connector tagged in blue tape."
+        },
+        {
+          "src": "/assets/garage/300zx-engine-hoist.webp",
+          "thumb": "/assets/garage/300zx-engine-hoist-sm.webp",
+          "alt": "Working on the engine while it hangs from the hoist in the garage, the car waiting behind it."
+        },
+        {
+          "src": "/assets/garage/300zx-timing.webp",
+          "thumb": "/assets/garage/300zx-timing-sm.webp",
+          "alt": "The front of the engine opened up — cam gears, timing belt and a new Nissan part still in its box."
+        },
+        {
+          "src": "/assets/garage/300zx-engine-drop.webp",
+          "thumb": "/assets/garage/300zx-engine-drop-sm.webp",
+          "alt": "The engine on a chain above the open bay, intake plenum and cam covers in view."
+        },
+        {
+          "src": "/assets/garage/300zx-dusk-rear.webp",
+          "thumb": "/assets/garage/300zx-dusk-rear-sm.webp",
+          "alt": "Rear three-quarter of the finished car parked on a country road with the mountains behind it."
+        }
+      ],
+      "story": {
+        "kicker": "The 300ZX project",
+        "headline": "Engine out, and everything I didn’t know yet.",
+        "lede": "A 1991 300ZX that came out of California, and the months I spent taking it apart in a one-car garage to swap the turbos. No shop, no lift, no real idea what I was doing — a hoist, a lot of blue tape, and the willingness to be bad at something new.",
+        "cover": {
+          "src": "/assets/garage/300zx-bay-stripped.webp",
+          "thumb": "/assets/garage/300zx-bay-stripped-sm.webp",
+          "alt": "The engine bay stripped down to bare metal and wiring, the harness laid out across the car with every connector tagged in blue tape."
+        },
+        "specs": [
+          {
+            "label": "Car",
+            "value": "1991 Nissan 300ZX (Z32)"
+          },
+          {
+            "label": "Engine",
+            "value": "VG30DETT · twin turbo"
+          },
+          {
+            "label": "Route",
+            "value": "California → Colorado"
+          },
+          {
+            "label": "The job",
+            "value": "Turbo swap, engine out"
+          },
+          {
+            "label": "Garage",
+            "value": "One car, one hoist, no lift"
+          },
+          {
+            "label": "Status",
+            "value": "Running. Never finished."
+          }
+        ],
+        "chapters": [
+          {
+            "id": "california",
+            "title": "It started in California",
+            "body": [
+              "The car came out of California — a 1991 Z32, the generation of 300ZX that still looks like it was drawn for a future that never quite arrived. Getting it back to Colorado was the first part of this project I had no real plan for.",
+              "It ran. That was the main thing. Everything after that was a list I kept adding to."
+            ],
+            "image": {
+              "src": "/assets/garage/300zx-dusk-rear.webp",
+              "thumb": "/assets/garage/300zx-dusk-rear-sm.webp",
+              "alt": "Rear three-quarter of the finished car parked on a country road with the mountains behind it."
+            }
+          },
+          {
+            "id": "turbos",
+            "title": "The job that kept getting bigger",
+            "body": [
+              "The turbos were the reason I opened the hood in the first place. On this engine they sit low and buried, wrapped in everything else the car needs to run. Every guide said it could be done with the engine still in the car. Every guide also said I would regret it.",
+              "So the engine came out. That one decision turned a weekend into a season of weekends — and it is the only reason I learned anything."
+            ],
+            "image": {
+              "src": "/assets/garage/300zx-engine-drop.webp",
+              "thumb": "/assets/garage/300zx-engine-drop-sm.webp",
+              "alt": "The engine on a chain above the open bay, intake plenum and cam covers in view."
+            }
+          },
+          {
+            "id": "method",
+            "title": "Blue tape and labelled bags",
+            "body": [
+              "I had no mechanical experience to fall back on, so I borrowed the only discipline I had. Label everything. Change one thing at a time. Never trust memory over documentation.",
+              "Every connector got a strip of blue tape with a name on it. Every bolt went into a bag marked with the thing it came off. The harness came out in one piece and got laid across the bay like a map. Photos before, during and after each step — a commit history for a car."
+            ],
+            "image": {
+              "src": "/assets/garage/300zx-timing.webp",
+              "thumb": "/assets/garage/300zx-timing-sm.webp",
+              "alt": "The front of the engine opened up — cam gears, timing belt and a new Nissan part still in its box."
+            }
+          },
+          {
+            "id": "learning",
+            "title": "Being an amateur, on purpose",
+            "body": [
+              "I got things wrong. I took things apart in an order I had to walk back. I waited on parts I did not know I needed until the moment I needed them. I found out what a torque spec is actually for.",
+              "None of it was fast, and all of it was mine. There is a specific kind of confidence that only comes from putting something back together yourself and having it start."
+            ],
+            "image": {
+              "src": "/assets/garage/300zx-engine-hoist.webp",
+              "thumb": "/assets/garage/300zx-engine-hoist-sm.webp",
+              "alt": "Working on the engine while it hangs from the hoist in the garage, the car waiting behind it."
+            }
+          },
+          {
+            "id": "road",
+            "title": "Back on the road",
+            "body": [
+              "It runs. It goes down a back road at dusk with the factory red still showing under the hood, and I know it now — nut by nut, connector by connector.",
+              "It is not finished. It was never going to be. That is most of the appeal."
+            ],
+            "image": {
+              "src": "/assets/garage/300zx-dusk-front.webp",
+              "thumb": "/assets/garage/300zx-dusk-front-sm.webp",
+              "alt": "The white 300ZX at dusk on a back road below the Flatirons, headlights on."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "community",
+      "title": "Nepalese Student Association",
+      "description": "President of the NSA at CU Boulder, 2021–2023. Led student organization meetings and events to spread and embrace Nepalese culture on campus, including Nepal Night — one of the association’s most successful annual celebrations, with more than 800 attendees."
+    }
+  ],
+  "contact": {
+    "email": "parthshrestha12@gmail.com",
+    "github": "https://github.com/parthshrestha"
+  }
+}

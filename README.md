@@ -26,15 +26,30 @@ npm test
 
 `content/portfolio.json` is canonical. Zod validates the bundled frontend snapshot and API responses; Pydantic validates server startup content and endpoint responses. The page renders immediately from the snapshot, then tries the API with a 2.5 second timeout. API failures leave the snapshot intact. Rebuild after content edits.
 
-Draft content was authorized by the owner for this initial release. Project names and stacks come from the brief. Case studies remain draft descriptions with no fabricated achievements. Add verified repository/demo links, actual screenshots, photography, full biography, and contact destinations to complete the content. Missing links are hidden.
+Content is drawn from the owner's resume (`Parth_Shrestha_Claude_corps.pdf`, 2026-10-04): the biography, the five projects and their case studies, the four experience entries, skills, education and certifications are all taken from it, with no fabricated achievements. Live site links are set for The Luthier's Library, LensHive and Shrestha Media and each was checked for a 200 response on 2026-10-04; they render as "Go live" buttons on the project card and project page. Repository links are still absent, and missing links are hidden. The resume's phone number is deliberately not published, and the schema has no field for it.
+
+Beyond `owner`, `projects`, `interests` and `contact`, the schema carries `experience`, `education`, `certifications` and `skills`. All four default to empty and render only when populated, so older content without them stays valid. The About section renders them below the biography.
 
 ## Portrait and animation
 
-The portrait is generated from the supplied photograph and visual mockup. It is artistic interpretation, not a scanned 3D model. It is sampled once into GPU point buffers with stable seeded destinations. ScrollTrigger supplies one normalized progress value; the shader derives turn, dispersion, and fade directly from it. No time-driven dissolution or random target regeneration. Reverse scrolling reconstructs identical points. Rendering is demand-driven and stops without scroll/pointer changes; pointer updates stop after full dispersion.
+The hero uses one static asset, `apps/web/public/assets/hero/portrait-fallback.webp`, three ways: as the accessible `<img>` that shows first and whenever graphics are unavailable, as the sampling source for the particles, and as the layout box the particles are drawn over.
 
-The current surface has estimated relief depth. **A genuine full profile turn is outstanding** until a prepared owner-likeness head and hair mesh is supplied (`public/assets/hero/head.glb`). Do not describe the current shallow relief as a complete 3D head. The reference video has a full head rotating and transforming into strands; this version interprets its choreography with particles.
+**Sampling.** On load, `apps/web/src/features/hero/sampler.ts` finds every dot of the stippled artwork (local maxima of the smoothed luminance; about 14k dots on the current portrait, roughly 50 ms) and turns each one into a particle with a fixed source position, a radius taken from the dot's size, a left-to-right `order`, and four seeded randoms. Nothing is regenerated afterwards, so particle identity is stable across frames, resizes and reloads. The served WebP has a transparent background (see `docs/assets.md` for how it is derived from the PNG master); the sampler composites it over black before reading, so a black-background replacement works too.
 
-Motion can be disabled from the header; the preference is saved locally. System reduced-motion starts with the static portrait. WebGL/asset errors retain HTML content and the fallback image. The avatar is disabled; `experience.avatarEnabled`, stable section IDs, active navigation, normalized hero progress, and `#companion-overlay` are the Phase 2 hooks.
+**Scroll timeline.** GSAP ScrollTrigger supplies one normalized progress value for the 240svh hero region, and the canvas renderer in `apps/web/src/features/hero/Particles.tsx` derives everything from it. The schedule lives in `apps/web/src/experience/timeline.ts` (`schedule`); the renderer and unit tests use the same particle timeline functions.
+
+| Progress | What happens |
+| --- | --- |
+| 0.00–0.12 | Intact face; continuous dot drift, pointer repulsion and click ripples |
+| 0.12–0.72 | A ragged departure front sweeps across the head from its left edge to its right edge. Each dot loosens just before it leaves, then accelerates leftwards along its own seeded, gently curling path, so the trail is dense beside the face and sparse far out |
+| 0.28–0.70 | Explore cards fade in beneath the trail |
+| 0.85–0.97 | Global fade; by 0.97 nothing is drawn and the canvas stops rendering |
+
+Scrolling up evaluates the same function backwards, so the face reassembles dot for dot, and stopping holds the frame. The head does not turn: the profile turn in the brief needs a prepared head and hair mesh (`public/assets/hero/head.glb`, not supplied) and was deliberately left out in favour of a correct dispersal.
+
+**Tuning.** Edit `schedule` in `timeline.ts` for timing (sweep start and length, per-dot jitter, flight duration, final fade) or the constants in the canvas renderer for the look (flight distance `0.4 + seed * 1.3` image widths, vertical fan `0.6`, curl amplitude, dot growth). `npm test` checks that the schedule is monotonic, reversible, intact at `schedule.start` and empty at `schedule.fadeEnd`.
+
+**Rendering and fallbacks.** The portrait uses Canvas 2D and requestAnimationFrame, so animation does not depend on WebGL availability or a separate React Three Fiber render root. Dots are batched into eight opacity paths. Ambient drift, mouse repulsion, click/tap ripples, and reversible scroll dispersal share the same particle identities. Rendering pauses when the document is hidden or the portrait has dispersed, and resumes on visibility or scroll. Readiness is reported after the first draw. Reduced motion and image/canvas errors retain the static portrait. The `?debug` overlay reports readiness, failure, progress, and frame rate.
 
 ## Hosting
 
@@ -45,9 +60,10 @@ React Router handles project routes and unknown pages; Sites static hosting supp
 ## Remaining content/assets
 
 - Prepared 3D head/hair geometry and approval of artistic portrait likeness.
-- Real project screenshots and complete architecture/results.
+- Real project screenshots; cover art exists only for The Luthier's Library and the 300ZX.
 - Photography gallery images.
-- Verified email, GitHub, LinkedIn, optional resume.
+- Repository links per project; live site links are set for the three deployed projects.
+- LinkedIn URL and a hosted resume link, if wanted; email and GitHub are set.
 - Deployment of the Python service if a live API is required.
 
-Cover images are generated illustrations, not project screenshots or photos of the owner's vehicle. See `docs/assets.md`.
+Project cards carry either a real site logo (`image.fit: "contain"`, rendered on a light plate) or a generated editorial illustration. Neither is a project screenshot, and the 300ZX art is not a photo of the owner's vehicle. See `docs/assets.md`.

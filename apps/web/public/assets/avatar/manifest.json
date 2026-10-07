@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "renderer": "cutout-2d",
+  "productionReady": false,
+  "roles": [
+    "casual"
+  ],
+  "clips": [
+    "idle",
+    "wave",
+    "poke",
+    "think",
+    "stretch",
+    "rest",
+    "nap",
+    "scroll",
+    "study",
+    "balance"
+  ],
+  "atlas": "/assets/avatar/casual-parts-v1.png",
+  "bounds": {
+    "width": 160,
+    "height": 180
+  },
+  "sceneAtlas": "/assets/avatar/scene-parts-v1.png"
+}

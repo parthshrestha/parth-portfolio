@@ -48,6 +48,18 @@
   - Prefer `cwebp -lossless` for any new diagram supplied as PNG/SVG; copy as-is if it is already a reasonably sized WebP.
 
   Each project's `caseStudy.architecture` prose was rewritten to describe exactly the components and edges its diagram shows, so **if a diagram is replaced, the prose has to move with it.** Two known mismatches were resolved in the diagram's favour: Shrestha Media's case study previously described a static site with no backend, and The Luthier's Library's previously claimed Aurora RDS and EC2 hosting, which its diagram does not show (it says MySQL via SQLAlchemy, and its footer states deployment hosting is not specified).
+- `assets/brand/logo-full.webp`, `favicon-32.png`, `apple-touch-icon.png`, `icon-512.png`: the owner's own PS monogram logo, supplied 2026-10-07 as a 1254×1254 PNG. The source is **RGBA with a transparent background and a black glyph** — not black on white as it appears in a viewer, so `format=gray` composites it to solid black and loses the artwork. Work from the alpha channel. Content bounds in the source: full logo at x=308 y=340 638×610, monogram alone at x=404 y=340 453×509, wordmark at y=903.
+
+  The site is dark, so the glyph is recoloured to `--color-paper` while the supplied alpha is kept:
+
+  ```sh
+  ffmpeg -i logo.png -filter_complex \
+    "[0:v]crop=638:610:308:340,scale=760:-1,format=rgba,geq=r='238':g='233':b='223':a='alpha(X,Y)'" \
+    -frames:v 1 /tmp/logo-full.png
+  cwebp -q 92 -alpha_q 100 -m 6 /tmp/logo-full.png -o apps/web/public/assets/brand/logo-full.webp
+  ```
+
+  The icons are the monogram alone on a `--color-ink` tile at ~65% height, rendered at 512 and downscaled with lanczos to 180 and 32 — the wordmark is illegible at tab size, so it is cropped out. These replaced the earlier hand-drawn `favicon.svg`, which was deleted. A `logo-mark.webp` (monogram, paper, transparent) is not committed because nothing references it; regenerate it from the crop above if a standalone mark is wanted.
 - Reference `.mov`: inspected locally at half-second intervals; not redistributed.
 - No licensed third-party imagery downloaded.
 

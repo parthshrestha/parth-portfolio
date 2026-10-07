@@ -144,7 +144,7 @@ export default function Hero({motion}: {motion: boolean}) {
         </p>
       </div>
       <div ref={cards} className={`absolute inset-x-6 top-[28%] mx-auto max-w-[1150px] ${motion && !failed ? 'opacity-0 invisible' : 'hidden'}`}>
-        <div className="grid grid-cols-2 gap-4 md:gap-x-[48%] md:gap-y-8">
+        <div className="relative grid grid-cols-2 gap-4 md:gap-x-[48%] md:gap-y-8">
           {explore.map(([n, label, id], i) => (
             <a key={id} href={`#${id}`} className={`glass border border-white/20 p-5 hover:border-amber sm:p-8 ${i > 1 ? 'translate-y-20' : ''}`}>
               <span className="label text-muted">{n} / Explore</span>
@@ -152,6 +152,15 @@ export default function Hero({motion}: {motion: boolean}) {
               <span className="mt-4 block text-amber">↗</span>
             </a>
           ))}
+          {/* The 48% column gap exists to leave the middle empty; the mark sits in it, and only once
+              there is a gap to sit in. mt-10 answers the translate-y-20 on the second row, which
+              shifts the cards visually without changing the grid's layout height. */}
+          <img
+            src="/assets/brand/logo-full.webp"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-1/2 mt-10 hidden w-[min(24vw,290px)] -translate-x-1/2 -translate-y-1/2 md:block"
+          />
         </div>
       </div>
       <a ref={cue} href="#work" className="label absolute bottom-[108px] left-1/2 -translate-x-1/2 whitespace-nowrap text-muted">

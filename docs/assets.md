@@ -33,8 +33,19 @@
   cwebp -q 70 -m 6 /tmp/<name>.png -o apps/web/public/assets/reel/<name>-poster.webp
   ```
 
+  **The four iPhone sources are HDR and must be tone-mapped, not just scaled.** `IMG_7891`, `IMG_5617`, `IMG_6112` and `IMG_6099` are 10-bit `yuv420p10le`, BT.2020 primaries, `arib-std-b67` (HLG) transfer, with a Dolby Vision configuration record. A plain `scale` + `format=yuv420p` decodes the HLG signal and hands it to x264 unconverted — the output is 8-bit SDR pixels still tagged `bt2020nc`/`arib-std-b67`, and every browser reads it as BT.709. HLG places midtones much lower in its curve, so the result is visibly washed out: measured mean luma 151 against 124 for a correct conversion of the same frame, about 22% too bright.
+
+  This build of ffmpeg has no `libzimg`, so the usual `zscale=t=linear,tonemap=...` chain is unavailable. macOS's own `avconvert` tone-maps correctly and can trim in the same pass, which also matches what the owner sees opening the originals in QuickTime:
+
+  ```sh
+  avconvert --source IMG_6112.MOV --preset Preset1920x1080 --start 3.8 --duration 4 --output /tmp/sdr.mov --replace
+  # then the ffmpeg encode above, from /tmp/sdr.mov instead of the original
+  ```
+
+  Check `color_transfer` on any new clip before encoding: `arib-std-b67` or `smpte2084` means HDR and needs this step. The three `singular_display` sources are already `bt709` and go straight through ffmpeg.
+
   `ffmpeg` applies each source's rotation metadata on decode, so these did not hit the sideways problem the stills did. `celebration.mp4` shows guests at a private family event; the rest show clients at portrait shoots — check before publishing that everyone pictured is happy to appear.
-- `assets/studio/*.webp`: four stills for the Shrestha Media story page, pulled as single frames out of the same behind-the-scenes `.MOV` originals as the reel clips (`camera-back` from IMG_6112 at 4.7s, `field-shoot` from IMG_5617 at 1.2s, `celebration` from od_video-575 at 130s, `capitol` from IMG_7891 at 6.3s). 1500px long edge at `cwebp -q 80`, plus a `-sm` 760px copy. They are video frames, not shutter-captured stills, so they are softer than the `garage` photographs — swap in real exports if any exist.
+- `assets/studio/*.webp`: four stills for the Shrestha Media story page, pulled as single frames out of the same behind-the-scenes `.MOV` originals as the reel clips (`camera-back` from IMG_6112 at 4.7s, `field-shoot` from IMG_5617 at 1.2s, `celebration` from od_video-575 at 130s, `capitol` from IMG_7891 at 6.3s). All but `celebration` come from HDR sources and are cut from the tone-mapped `avconvert` intermediates described above, not the raw `.MOV`. 1500px long edge at `cwebp -q 80`, plus a `-sm` 760px copy. They are video frames, not shutter-captured stills, so they are softer than the `garage` photographs — swap in real exports if any exist.
 
   ```sh
   ffmpeg -ss <time> -i <source.MOV> -frames:v 1 -vf "scale=-2:1500" /tmp/<name>.png

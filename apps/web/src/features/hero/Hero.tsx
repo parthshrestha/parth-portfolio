@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 import {experience, schedule, stages} from '../../experience/timeline';
 import {Arrow} from '../../ui/Arrow';
+import {Diamond} from './Diamond';
 
 const Particles = lazy(() => import('./Particles'));
 gsap.registerPlugin(ScrollTrigger);
@@ -172,25 +173,10 @@ export default function Hero({motion}: {motion: boolean}) {
           <br />A lot of possibility.
         </p>
       </div>
-      <div ref={cards} className={`absolute inset-x-6 top-[28%] mx-auto max-w-[1150px] ${motion && !failed ? 'opacity-0 invisible' : 'hidden'}`}>
-        <div className="relative grid grid-cols-2 gap-4 md:gap-x-[48%] md:gap-y-8">
-          {explore.map(([n, label, id], i) => (
-            <a key={id} href={`#${id}`} className={`glass border border-white/20 p-5 hover:border-amber sm:p-8 ${i > 1 ? 'translate-y-20' : ''}`}>
-              <span className="label text-muted">{n} / Explore</span>
-              <h2 className="mt-4 text-lg sm:text-2xl">{label}</h2>
-              <span className="mt-4 block text-xl leading-none text-amber sm:text-2xl"><Arrow /></span>
-            </a>
-          ))}
-          {/* The 48% column gap exists to leave the middle empty; the mark sits in it, and only once
-              there is a gap to sit in. mt-10 answers the translate-y-20 on the second row, which
-              shifts the cards visually without changing the grid's layout height. */}
-          <img
-            src="/assets/brand/logo-full.webp"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-1/2 mt-10 hidden w-[min(24vw,290px)] -translate-x-1/2 -translate-y-1/2 md:block"
-          />
-        </div>
+      {/* Sits between the header and the nav. The stage is a size container so the diamond can take
+          whichever of width and height is smaller, on phones, short landscape screens and desktops alike. */}
+      <div ref={cards} className={`diamond-stage absolute inset-x-4 top-20 bottom-24 flex items-center justify-center md:top-16 md:bottom-28 ${motion && !failed ? 'opacity-0 invisible' : 'hidden'}`}>
+        <Diamond items={explore} />
       </div>
       <a ref={cue} href="#work" className="label absolute bottom-[108px] left-1/2 -translate-x-1/2 whitespace-nowrap text-muted">
         Scroll to explore <Arrow direction="down"/>

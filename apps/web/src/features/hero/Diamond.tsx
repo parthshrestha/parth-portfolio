@@ -1,5 +1,3 @@
-import {Arrow} from '../../ui/Arrow';
-
 /**
  * The explore menu: one diamond cut into four trapezoids around a smaller diamond that holds the mark.
  *
@@ -11,7 +9,8 @@ import {Arrow} from '../../ui/Arrow';
  *
  * Each section is a band on a 45° diagonal, so its text runs along the band rather than across it: a
  * horizontal block would be clipped at the band's edges. Rotations are ±45°, which keeps all four
- * readable (the top pair leans outward, the bottom pair inward, none upside down).
+ * readable (the top pair leans outward, the bottom pair inward, none upside down). The shape itself
+ * is the affordance, so the sections carry no arrows.
  */
 type Point = [number, number];
 
@@ -81,9 +80,8 @@ export function Diamond({items}: {items: string[][]}) {
                 {n}
                 <span className="hidden sm:inline"> / Explore</span>
               </span>
-              <span className="mt-1.5 flex items-center gap-2 text-[15px] leading-tight sm:text-lg md:text-xl">
+              <span className="mt-1.5 text-[15px] leading-tight sm:text-lg md:text-xl">
                 {label}
-                <span className="text-amber"><Arrow direction="right" /></span>
               </span>
             </span>
           </a>

@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import type {Interest,Shot} from '../../services/content';
+import {Arrow} from '../../ui/Arrow';
 const widths=['w-[150px]','w-[220px]','w-[128px]','w-[190px]','w-[164px]','w-[240px]'];
 function Row({shots,height,reverse,slow}:{shots:Shot[];height:string;reverse?:boolean;slow?:boolean}){return <div className={`drift ${slow?'drift-slow':''} ${reverse?'drift-rev':''}`}>{[...shots,...shots].map((s,i)=><img key={`${s.src}-${i}`} src={s.thumb} alt="" aria-hidden="true" loading="lazy" decoding="async" className={`${widths[i%shots.length]} ${height} mr-3 shrink-0 object-cover`}/>)}</div>}
 export default function Collage({interest,motion}:{interest:Interest;motion:boolean}){const {gallery,story,slug,title,description}=interest;const second=[...gallery.slice(3),...gallery.slice(0,3)];
@@ -11,5 +12,5 @@ return <Link to={`/after-hours/${slug}`} aria-label={`${title} — read the full
 <p className="label text-amber">{story?.kicker??'Personal project'}</p>
 <h3 className="mt-3 text-3xl sm:text-4xl">{title}</h3>
 <p className="mt-3 line-clamp-2 max-w-xl leading-7 text-muted sm:line-clamp-none">{description}</p>
-<span className="mt-6 block text-amber">Open the build ↗</span>
+<span className="mt-6 block text-amber">Open the build <Arrow/></span>
 </div></Link>}

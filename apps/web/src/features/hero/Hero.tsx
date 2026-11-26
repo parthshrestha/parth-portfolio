@@ -39,9 +39,9 @@ function Diagnostics({ready, failed, motion}: {ready: boolean; failed: boolean; 
 }
 
 const explore = [
-  ['01', 'Selected work', 'work'],
-  ['02', 'After hours', 'after-hours'],
-  ['03', 'About me', 'about'],
+  ['01', 'About me', 'about'],
+  ['02', 'Selected work', 'work'],
+  ['03', 'After hours', 'after-hours'],
   ['04', 'Let’s connect', 'contact'],
 ];
 
@@ -178,7 +178,7 @@ export default function Hero({motion}: {motion: boolean}) {
       <div ref={cards} className={`diamond-stage absolute inset-x-4 top-20 bottom-24 flex items-center justify-center md:top-16 md:bottom-28 ${motion && !failed ? 'opacity-0 invisible' : 'hidden'}`}>
         <Diamond items={explore} />
       </div>
-      <a ref={cue} href="#work" className="label absolute bottom-[108px] left-1/2 -translate-x-1/2 whitespace-nowrap text-muted">
+      <a ref={cue} href="#about" className="label absolute bottom-[108px] left-1/2 -translate-x-1/2 whitespace-nowrap text-muted">
         Scroll to explore <Arrow direction="down"/>
       </a>
       <div className="absolute right-6 bottom-32 hidden text-right md:block">

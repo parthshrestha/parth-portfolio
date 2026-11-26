@@ -172,30 +172,32 @@ export default function Hero({motion}: {motion: boolean}) {
           <br />A lot of possibility.
         </p>
       </div>
-      <div ref={cards} className={`absolute inset-x-6 top-[28%] mx-auto max-w-[1150px] ${motion && !failed ? 'opacity-0 invisible' : 'hidden'}`}>
-        <div className="relative grid grid-cols-2 gap-4 md:gap-x-[48%] md:gap-y-8">
+      <div ref={cards} className={`absolute inset-x-6 top-[28%] mx-auto max-w-[1150px] md:top-24 md:bottom-28 md:flex md:items-center short:top-20 short:bottom-24 ${motion && !failed ? 'opacity-0 invisible' : 'hidden'}`}>
+        <div className="relative grid w-full grid-cols-2 gap-4 md:gap-x-[48%] md:gap-y-8 short:gap-y-4">
           {explore.map(([n, label, id], i) => (
-            <a key={id} href={`#${id}`} className={`glass border border-white/20 p-5 hover:border-amber sm:p-8 ${i > 1 ? 'translate-y-20' : ''}`}>
+            <a key={id} href={`#${id}`} className={`glass border border-white/20 p-5 hover:border-amber sm:p-8 short:px-7 short:py-5 ${i > 1 ? 'translate-y-20 md:translate-y-0 md:mt-20 short:mt-8' : ''}`}>
               <span className="label text-muted">{n} / Explore</span>
-              <h2 className="mt-4 text-lg sm:text-2xl">{label}</h2>
-              <span className="mt-4 block text-xl leading-none text-amber sm:text-2xl"><Arrow /></span>
+              <h2 className="mt-4 text-lg sm:text-2xl short:mt-2 short:text-xl">{label}</h2>
+              <span className="mt-4 block text-xl leading-none text-amber sm:text-2xl short:mt-3"><Arrow /></span>
             </a>
           ))}
           {/* The 48% column gap exists to leave the middle empty; the mark sits in it, and only once
-              there is a gap to sit in. mt-10 answers the translate-y-20 on the second row, which
-              shifts the cards visually without changing the grid's layout height. */}
+              there is a gap to sit in. From md up the second row's offset is a real margin, so the
+              grid's height includes it and the mark centres on the whole staggered block. On short
+              landscape screens (car browsers, small laptops) the cards and the offset tighten so all
+              four fit between the header and the nav. */}
           <img
             src="/assets/brand/logo-full.webp"
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-1/2 mt-10 hidden w-[min(24vw,290px)] -translate-x-1/2 -translate-y-1/2 md:block"
+            className="pointer-events-none absolute left-1/2 top-1/2 hidden w-[min(24vw,290px)] short:w-[min(20vw,34vh)] -translate-x-1/2 -translate-y-1/2 md:block"
           />
         </div>
       </div>
       <a ref={cue} href="#work" className="label absolute bottom-[108px] left-1/2 -translate-x-1/2 whitespace-nowrap text-muted">
         Scroll to explore <Arrow direction="down"/>
       </a>
-      <div className="absolute right-6 bottom-32 hidden text-right md:block">
+      <div className="absolute right-6 bottom-32 hidden text-right md:block short:hidden">
         <span className="label leading-6 text-muted">
           Ideas
           <br />

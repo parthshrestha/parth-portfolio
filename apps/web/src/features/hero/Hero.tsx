@@ -2,9 +2,12 @@ import {Component, Suspense, lazy, useEffect, useRef, useState, type ReactNode} 
 import gsap from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 import {experience, schedule, stages} from '../../experience/timeline';
+import {Arrow} from '../../ui/Arrow';
 
 const Particles = lazy(() => import('./Particles'));
 gsap.registerPlugin(ScrollTrigger);
+// The mobile address bar showing or hiding resizes the viewport mid-scroll; recalculating then causes a jump.
+ScrollTrigger.config({ignoreMobileResize: true});
 
 class GraphicsBoundary extends Component<{children: ReactNode; onError: (reason: string) => void}, {failed: boolean}> {
   state = {failed: false};
@@ -77,24 +80,50 @@ export default function Hero({motion}: {motion: boolean}) {
       if (cards.current) {
         cards.current.style.opacity = String(s.cards);
         cards.current.style.visibility = s.cards > 0 ? 'visible' : 'hidden';
-        cards.current.style.transform = `translateY(${(1 - s.cards) * 65}px)`;
+        cards.current.style.transform = `translate3d(0, ${(1 - s.cards) * 65}px, 0)`;
       }
       root.current?.setAttribute('data-progress', p.toFixed(3));
+    };
+    // Scroll events arrive in uneven steps, especially from touch momentum on phones. Rather than jumping
+    // to each one, the rendered progress eases toward the scroll position on a short, frame-rate
+    // independent lag, so the dispersal glides instead of stuttering.
+    let shown = 0;
+    let target = 0;
+    const lag = 0.12; // seconds to cover ~63% of the remaining distance
+    const follow = (_time: number, deltaMs: number) => {
+      const step = 1 - Math.exp(-Math.min(deltaMs, 100) / 1000 / lag);
+      shown += (target - shown) * step;
+      if (Math.abs(target - shown) < 0.0005) {
+        shown = target;
+        gsap.ticker.remove(follow);
+      }
+      apply(shown);
+    };
+    const chase = (p: number) => {
+      target = p;
+      gsap.ticker.remove(follow);
+      gsap.ticker.add(follow);
+    };
+    const jump = (p: number) => {
+      gsap.ticker.remove(follow);
+      target = shown = p;
+      apply(p);
     };
     const trigger = ScrollTrigger.create({
       trigger: root.current.parentElement,
       start: 'top top',
       end: 'bottom bottom',
-      onUpdate: self => apply(self.progress),
-      onRefresh: self => apply(self.progress),
+      onUpdate: self => chase(self.progress),
+      onRefresh: self => jump(self.progress),
     });
     // Restored scroll positions and anchor visits must land on the matching frame, not on progress 0.
     const frame = requestAnimationFrame(() => {
       ScrollTrigger.refresh();
-      apply(trigger.progress);
+      jump(trigger.progress);
     });
     return () => {
       cancelAnimationFrame(frame);
+      gsap.ticker.remove(follow);
       trigger.kill();
     };
   }, [motion, failed]);
@@ -149,7 +178,7 @@ export default function Hero({motion}: {motion: boolean}) {
             <a key={id} href={`#${id}`} className={`glass border border-white/20 p-5 hover:border-amber sm:p-8 ${i > 1 ? 'translate-y-20' : ''}`}>
               <span className="label text-muted">{n} / Explore</span>
               <h2 className="mt-4 text-lg sm:text-2xl">{label}</h2>
-              <span className="mt-4 block text-amber">↗</span>
+              <span className="mt-4 block text-xl leading-none text-amber sm:text-2xl"><Arrow /></span>
             </a>
           ))}
           {/* The 48% column gap exists to leave the middle empty; the mark sits in it, and only once
@@ -164,7 +193,7 @@ export default function Hero({motion}: {motion: boolean}) {
         </div>
       </div>
       <a ref={cue} href="#work" className="label absolute bottom-[108px] left-1/2 -translate-x-1/2 whitespace-nowrap text-muted">
-        Scroll to explore ↓
+        Scroll to explore <Arrow direction="down"/>
       </a>
       <div className="absolute right-6 bottom-32 hidden text-right md:block">
         <span className="label leading-6 text-muted">

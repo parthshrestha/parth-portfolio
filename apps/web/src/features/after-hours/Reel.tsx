@@ -1,6 +1,7 @@
 import React,{useEffect,useRef} from 'react';
 import {Link} from 'react-router-dom';
 import type {Clip,Interest} from '../../services/content';
+import {Arrow} from '../../ui/Arrow';
 function Frame({clip,motion}:{clip:Clip;motion:boolean}){const ref=useRef<HTMLVideoElement>(null);
 useEffect(()=>{const video=ref.current;if(!video)return;let visible=false,starting:Promise<void>|null=null;
 const sync=()=>{const wanted=visible&&!document.hidden;if(wanted&&video.paused&&!starting)starting=video.play().catch(()=>{}).finally(()=>{starting=null});else if(!wanted&&!video.paused)starting?starting.then(()=>video.pause()):video.pause()};
@@ -15,6 +16,6 @@ return <section className="relative isolate border border-white/20 bg-panel p-7 
 <p className="label text-amber">{kicker??'Photography'}</p>
 <h3 className="mt-3 text-3xl sm:text-4xl">{open?<Link to={`/after-hours/${slug}`} className="after:absolute after:inset-0 after:content-['']">{title}</Link>:title}</h3>
 <p className="mt-3 max-w-xl leading-7 text-muted">{description}</p>
-{open&&<span className="mt-6 block text-amber">Read the story ↗</span>}
+{open&&<span className="mt-6 block text-amber">Read the story <Arrow/></span>}
 <div role="group" aria-label={`Clips from recent ${title.toLowerCase()} shoots`} className="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-4">{reel.map(c=><Frame key={c.src} clip={c} motion={motion}/>)}</div>
 </section>}
